@@ -28,9 +28,15 @@
 <br>
 <br>
 <div *ngIf="resultados">
-
+    <div class="alert alert-info" role="alert">
+        Realizar los calculos con respecto a la informacion de: {{origenFuente}}
+    </div>
+    <button type="button" class="btn btn-primary btn-lg" (click)="dosomething();changeFuente('Fuente total.');">Fuente Total.</button>
+    <button type="button" class="btn btn-secondary btn-lg" (click)="calcularCompactoMsn();changeFuente('Feunte Mensaje');">Mensaje.</button>
+    <br>
+    <br>
     <mat-toolbar color="primary">
-        <span>Resultados: </span>
+        <span>Resultados: {{origenFuente}} </span>
     </mat-toolbar>
     <div class="alert alert-primary" role="alert">
         Entropia total de la fuente: {{entropiaT}} bits
@@ -43,7 +49,7 @@
     </div>
 
     <mat-toolbar color="accent">
-        <span>Reducciòn de codigo: </span>
+        <span>Reducciòn de codigo: {{origenFuente}} </span>
     </mat-toolbar>
 
     <div class="alert alert-info" role="alert">

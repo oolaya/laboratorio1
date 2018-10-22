@@ -27,10 +27,22 @@ export class AppComponent {
   crfinal1: any;
   crfinal2: any;
   //=> Bandera para mostrar o no contenido. 
-  resultados: boolean = false;
+  resultados: boolean = false; ç
+
+  //=> Arreglo de la fuente seleccionada.
+  arrayFuenteSelected: any = [];
+
+  //=> Variable de cambio de fuente.
+  origenFuente = "Fuente total."
+  // global final 
+  globalArray: any = [];
+  temArray: any = [];
+
   constructor(public dialog: MatDialog) {
     this.codigoFuente();
   }
+
+
 
   /**
    * Metodo que permite crear el codigo fuente con las probabilidades preestablecidas.
@@ -154,6 +166,7 @@ export class AppComponent {
   dosomething() {
     //=> Incializamo siempre el array Auxiliar, este metodo es un on change. 
     this.arrayAuxiliar = [];
+    this.arrayFuenteSelected = [];
 
     //=> Con ayuda del objeto nativo de angular capturamos el contenido de la caja.
     let msn = this.con.nativeElement.value;
@@ -170,10 +183,14 @@ export class AppComponent {
         let caracter = this.fuente.filter(d => d.simbolo == element);
         //=> Validamos la existencia del caracter sino lo insertamos y le asignamos una probabilidad. 
         if (caracter.length > 0) {
+          //=> Lo agragamos al arreglo de la fuente que selecciono. 
+          this.arrayFuenteSelected.push(caracter[0]);
           this.addToArray(caracter[0]);
         } else {
           //=> Se realiza la insercion del nuevo codigo, se obtine por tabla ascii el valor definido par aposteriormente calular su valor en binario.
           let objTem = { valor: element.charCodeAt(0), simbolo: element, pro: 0.02 };
+          //=> Lo agragamos al arreglo de la fuente que selecciono. 
+          this.arrayFuenteSelected.push(objTem);
           this.fuente.push(objTem);
           this.addToArray(objTem);
         }
@@ -182,11 +199,12 @@ export class AppComponent {
       this.entropiaTmsn = this.calcularEntropiaMensaje(this.arrayAuxiliar).toString();
       this.kraft = this.calcularKraft(this.arrayAuxiliar);
       this.ordenarArray(this.arrayAuxiliar);
-      this.compactoHuffman();
+      this.compactoHuffman(this.fuente);
       setTimeout(() => {
         let fin = this.globalArray.length;
         this.crfinal1 = (this.globalArray[fin - 1][0].pro / 10);
         this.crfinal2 = (this.globalArray[fin - 1][1].pro / 10);
+
       }, 700);
     }
   }
@@ -277,17 +295,17 @@ export class AppComponent {
     });
     return arraySort;
   }
-  globalArray: any = [];
+
 
   /**
    * Metodo que realiza la reduccion de Hoftman.
    * HRincon && OOLaya
    */
-  private compactoHuffman() {
+  private compactoHuffman(fuente) {
     //=> Obtenemos el arrego ordenado de manera desendente del codigo fuente. 
-    let arrayHuffman = this.ordenarArrayHuffman(this.fuente);
+    let arrayHuffman = this.ordenarArrayHuffman(fuente);
     //=> declaramos una variable uxiliar que llamaremos moviento.
-    let movimiento;
+    let movimiento = [];
     //=> inicializamos la varible global del array la cual usamos despues para pintar el contenido en HTML, siempre la limpiamos cuando se llame este metodo.
     this.globalArray = [];
     //=> calculamos el valor de de la x de manera dinamica, 
@@ -311,11 +329,13 @@ export class AppComponent {
           //=> enviamos los dos objetos al metodo que realiza la suma de los dos factores a reducir. 
           let pro = this.metodoHuffman(obj1.pro, obj2.pro);
           //=> ahora realizamos la exclusion de los dos ultimos objetos que se redujeron por primer vez. 
-          let index1 = arrayHuffman.filter(d => d != obj1 && d != obj2);
+          var temMov1: any = Object.assign([], new Object, arrayHuffman);
+          temMov1.splice((arrayHuffman.length - 1), 1);
+          temMov1.splice((arrayHuffman.length - 2), 1);
           //=> una vez elimanados los dos ultimos lo que hacemos es agregar el nuevo que se acaba de crear. 
-          index1.push({ valor: "", simbolo: "", pro: pro });
+          temMov1.push({ valor: "", simbolo: "", pro: pro });
           //=> Enviamos al algoritmo de ordenamiento para iniciar el nuevo ciclo. 
-          movimiento = this.ordenarArrayHuffman(index1);
+          movimiento = this.ordenarArrayHuffman(temMov1);
         } else {//=> Siempre que no sea la primera o la ultima vez ingresara a esta secciòn. 
           //=> Agragamos el ultimo movimiento que teniamos en memoria. 
           this.globalArray.push(movimiento);
@@ -325,11 +345,13 @@ export class AppComponent {
           //=> enviamos a la sumatiria. 
           let pro = this.metodoHuffman(obj1.pro, obj2.pro);
           //=> Removemos los objetos del acumulado. 
-          let index2 = movimiento.filter(d => d != obj1 && d != obj2);
-          //=> Agragamos el nuevo objeto al array para continuar con el ciclo. 
-          index2.push({ valor: "", simbolo: "", pro: pro });
-          //=> Finalmente terminamos asignando el nuevo array al temporal. 
-          movimiento = this.ordenarArrayHuffman(index2);
+          var temMov: any = Object.assign([], new Object, movimiento);;
+          temMov.splice(x, 1);
+          temMov.splice((x - 1), 1);
+          //=> Finalmente terminamos asignando el nuevo array al movimiento. 
+          temMov.push({ valor: "", simbolo: "", pro: pro });
+          //=> Por ultimo reordenamos. 
+          movimiento = this.ordenarArrayHuffman(temMov);
         }
       }
       //=> Contamos hacia atras para lograr llegar a al ultima iteracion. 
@@ -376,6 +398,14 @@ export class AppComponent {
     this.entropiaTmsn = null;
     this.kraft = null;
     this.resultados = false;
+  }
+
+  calcularCompactoMsn() {
+    this.compactoHuffman(this.arrayFuenteSelected);
+  }
+  changeFuente(tipo) {
+    this.origenFuente = tipo;
+
   }
 
 }
