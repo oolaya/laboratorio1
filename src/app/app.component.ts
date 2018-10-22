@@ -389,6 +389,7 @@ export class AppComponent {
 
   /**
    * Metodo que permite limpiar todas las variables globlales si la entrada del mensaje es igual a vacio. 
+   * HRincon && OOLaya
    */
   clearAll() {
     this.crfinal1 = null;
@@ -400,12 +401,21 @@ export class AppComponent {
     this.resultados = false;
   }
 
+  /**
+   * Metodo que permite cargar la fuente con el origen del mesaje...
+   * HRincon && OOlaya
+   */
   calcularCompactoMsn() {
     this.compactoHuffman(this.arrayFuenteSelected);
   }
+
+  /**
+   * Metodo que permite establecer el tipo de fuente que se esta evaluando. 
+   * @param tipo Tipo de fuente cargada para el array.
+   * HRincon && OOlaya. 
+   */
   changeFuente(tipo) {
     this.origenFuente = tipo;
-
   }
 
 }
